@@ -9,9 +9,10 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
     testImplementation "junit:junit:4.13.2"
 }
 
 tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions.jvmTarget = "18"
+    kotlinOptions.jvmTarget = "19"
 }
