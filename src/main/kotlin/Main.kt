@@ -1,6 +1,15 @@
 fun main() {
 
     // TODO: Use Datafetcher through http
+    val satelliteDataFetcher = SatelliteDataFetcher()
+    val catalog = "stations"
+
+    val responseData = satelliteDataFetcher.fetchSatelliteData(catalog)
+    if (responseData != null) {
+        println(responseData)
+    } else {
+        println("Failed to fetch satellite data")
+    }
     val tleDataFilePath = "data/active.json"
     val satelliteDataList = DataParser.parseTLEFile(tleDataFilePath)
 
