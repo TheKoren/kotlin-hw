@@ -30,9 +30,12 @@ jobs:
       with:
         java-version: '18'
         distribution: 'temurin'
+        
+    - name: Grant execute permission to gradlew
+      run: chmod +x ./gradlew
 
     - name: Build with Gradle
       run: |
         ./gradlew build
       env:
-        GRADLE_OPTS: '-Dorg.gradle.daemon=false' # Recommended when running Gradle in CI
+        GRADLE_OPTS: '-Dorg.gradle.daemon=false'
