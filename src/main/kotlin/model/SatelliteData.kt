@@ -1,3 +1,5 @@
+package model
+
 data class SatelliteData (
     val OBJECT_NAME: String,
     val OBJECT_ID: String,
