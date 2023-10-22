@@ -12,7 +12,7 @@ object SatelliteCalculator {
     /**
      * @see <a href="https://www.spaceacademy.net.au/watch/track/leopars.htm">SpaceAcademy</a>
       */
-    private fun calculateAltitude(meanMotion: Double): Double {
+    fun calculateAltitude(meanMotion: Double): Double {
         val period = DAY_IN_SECONDS / meanMotion
         return Math.cbrt((period.pow(2)* GRAVITY_CONSTANT) / (2 * PI).pow(2)) - EARTH_RADIUS_KM
     }
