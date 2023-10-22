@@ -1,5 +1,6 @@
 fun main() {
 
+    // TODO: Use Datafetcher through http
     val tleDataFilePath = "data/active.json"
     val satelliteDataList = DataParser.parseTLEFile(tleDataFilePath)
 
