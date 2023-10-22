@@ -1,3 +1,6 @@
+package analysis
+
+import model.SatelliteData
 import kotlin.math.PI
 import kotlin.math.pow
 

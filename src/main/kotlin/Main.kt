@@ -1,3 +1,7 @@
+import analysis.SatelliteCalculator
+import network.SatelliteDataFetcher
+import parsing.DataParser
+
 fun main() {
 
     // TODO: Use Datafetcher through http
@@ -16,7 +20,7 @@ fun main() {
     val noradCatalogNumbers = SatelliteCalculator.getNoradCatalogNumber(satelliteDataList)
     println("NORAD Catalog Numbers of all satellites: $noradCatalogNumbers")
 
-    val topSatellitesByMeanMotion =SatelliteCalculator.getTopSatellitesByMeanMotion(satelliteDataList)
+    val topSatellitesByMeanMotion = SatelliteCalculator.getTopSatellitesByMeanMotion(satelliteDataList)
     topSatellitesByMeanMotion.take(5).forEachIndexed { index, satelliteData ->
         println("Top ${index + 1}: NORAD Catalog Number: ${satelliteData.NORAD_CAT_ID}, Mean Motion: ${satelliteData.MEAN_MOTION}")
     }
