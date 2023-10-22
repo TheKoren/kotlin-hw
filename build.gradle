@@ -13,5 +13,5 @@ dependencies {
 }
 
 tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions.jvmTarget = "19"
+    kotlinOptions.jvmTarget = "18"
 }
