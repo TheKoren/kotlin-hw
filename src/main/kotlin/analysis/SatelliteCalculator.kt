@@ -77,4 +77,19 @@ object SatelliteCalculator {
         }
         return longRunningSatellites
     }
+
+    fun analyzeLaunchYears(satelliteDataList: List<SatelliteData>) : Map<Int, Int> {
+        val launchDateMap = mutableMapOf<Int, Int>()
+
+        for (satelliteData in satelliteDataList) {
+            val launchDate = satelliteData.OBJECT_ID.getFirstPart().toInt()
+            val currentCount = launchDateMap[launchDate]
+            if (currentCount != null) {
+                launchDateMap[launchDate] = currentCount + 1
+            } else {
+                launchDateMap[launchDate] = 1
+            }
+        }
+        return launchDateMap
+    }
 }

@@ -10,7 +10,7 @@ fun main() {
     println("Available Datasets")
     println("1. Active satellites")
     println("2. Last 30 Days' Launches")
-    println("3. SpaceStations")
+    println("3. Space Stations")
 
     print("Enter the number of the dataset on which you want to perform analysis: ")
     val catalog : String = when (scanner.nextInt()) {
@@ -43,6 +43,7 @@ fun main() {
     println("2. Count of LEO and GEO Satellites")
     println("3. Analyze Constellations")
     println("4. Find Longest-Running Satellites")
+    println("5. Launch date of Satellites")
 
     print("Enter the number of the calculation you want to perform: ")
     when (scanner.nextInt()) {
@@ -67,6 +68,12 @@ fun main() {
             val longestRunningSatellites = SatelliteCalculator.findLongestRunningSatellites(satelliteDataList)
             longestRunningSatellites.forEachIndexed { index, satelliteInfo ->
                 println("Top ${index + 1}: NORAD Catalog Number: ${satelliteInfo.noradCatalogNumber}, Age in Years: ${satelliteInfo.ageInYears}")
+            }
+        }
+        5 -> {
+            val launchDateMap = SatelliteCalculator.analyzeLaunchYears(satelliteDataList)
+            launchDateMap.forEach { entry ->
+                println("Launch Year: ${entry.key}, Number of satellites: ${entry.value}")
             }
         }
         else -> {
