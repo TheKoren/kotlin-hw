@@ -19,7 +19,7 @@ class DataParser {
             return gson.fromJson(jsonString, listType)
         }
 
-        fun parseJsonile(jsonString: String): List<SatelliteData> {
+        fun parseJsonFile(jsonString: String): List<SatelliteData> {
             return parseSatelliteDataFromJson(jsonString)
         }
     }
