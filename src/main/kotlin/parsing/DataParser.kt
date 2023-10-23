@@ -18,5 +18,9 @@ class DataParser {
             val listType = object : TypeToken<List<SatelliteData>>() {}.type
             return gson.fromJson(jsonString, listType)
         }
+
+        fun parseJsonile(jsonString: String): List<SatelliteData> {
+            return parseSatelliteDataFromJson(jsonString)
+        }
     }
 }
