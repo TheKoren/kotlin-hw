@@ -2,6 +2,7 @@ package network
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
 
 /**
  * A utility class for fetching satellite data from an online API.
@@ -19,18 +20,21 @@ class SatelliteDataFetcher {
     fun fetchSatelliteData(catalog: String): String? {
         val apiUrl = "$baseUrl?GROUP=$catalog&FORMAT=json"
 
-        val request = Request.Builder()
-            .url(apiUrl)
-            .get()
-            .build()
-        try {
+        return try {
+            val request = Request.Builder()
+                .url(apiUrl)
+                .get()
+                .build()
+
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
-                return response.body?.string()
+                response.body?.string()
+            } else {
+                null
             }
-        } catch(e: Exception) {
+        } catch (e: IOException) {
             e.printStackTrace()
+            null
         }
-        return null
     }
 }

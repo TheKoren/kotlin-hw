@@ -13,16 +13,10 @@ fun main() {
     println("3. Space Stations")
 
     print("Enter the number of the dataset on which you want to perform analysis: ")
-    val catalog : String = when (scanner.nextInt()) {
-        1 -> {
-            "active"
-        }
-        2 -> {
-            "last-30-days"
-        }
-        3 -> {
-            "stations"
-        }
+    val catalog = when (scanner.nextInt()) {
+        1 -> "active"
+        2 -> "last-30-days"
+        3 -> "stations"
         else -> {
             println("Invalid choice.")
             return
@@ -30,18 +24,19 @@ fun main() {
     }
     val satelliteDataFetcher = SatelliteDataFetcher()
     val responseData = satelliteDataFetcher.fetchSatelliteData(catalog)
-    val satelliteDataList : List<SatelliteData>
-    if (responseData != null) {
-        satelliteDataList = responseData.let { DataParser.parseJsonFile(it) }
-        println("# of satellite data entries: ${satelliteDataList.size}")
+
+    val satelliteDataList: List<SatelliteData> = if (responseData != null) {
+        DataParser.parseJsonFile(responseData)
     } else {
         println("Failed to fetch satellite data")
         return
     }
 
+    println("# of satellite data entries: ${satelliteDataList.size}")
+
     println("Available Calculations:")
     println("1. Top 5 Satellites by Mean Motion")
-    println("2. Count of LEO and GEO Satellites")
+    println("2. Count of LEO and GEO and MEO Satellites")
     println("3. Analyze Constellations")
     println("4. Find Longest-Running Satellites")
     println("5. Launch date of Satellites")
@@ -54,32 +49,38 @@ fun main() {
                 println("Top ${index + 1}: NORAD Catalog Number: ${satelliteData.NORAD_CAT_ID}, Mean Motion: ${satelliteData.MEAN_MOTION}")
             }
         }
+
         2 -> {
-            val (leoCount, geoCount) = SatelliteCalculator.countLEOandGEO(satelliteDataList)
-            println("Number of Satellites in LEO: $leoCount. LEO percentage: ${(leoCount * 100 / satelliteDataList.size).toDouble()}%")
-            println("Number of Satellites in GEO: $geoCount. GEO percentage: ${(geoCount * 100 / satelliteDataList.size).toDouble()}%")
+            val (leoCount, geoCount, meoCount) = SatelliteCalculator.countLEOandGEOandMEO(satelliteDataList)
+            val totalSatellites = satelliteDataList.size
+            println("Number of Satellites in LEO: $leoCount. LEO percentage: ${leoCount * 100.0 / totalSatellites}%")
+            println("Number of Satellites in GEO: $geoCount. GEO percentage: ${geoCount * 100.0 / totalSatellites}%")
+            println("Number of Satellites in MEO: $geoCount. MEO percentage: ${meoCount * 100.0 / totalSatellites}%")
         }
+
         3 -> {
             val constellations = SatelliteCalculator.analyzeConstellations(satelliteDataList)
-            constellations.forEach { constellationInfo ->
-                println("Constellation: ${constellationInfo.key}, Number of Satellites: ${constellationInfo.value.getNumberOfSatellites()}, Mean Altitude: ${constellationInfo.value.getMeanAltitude()}")
+            constellations.forEach { (constellationName, constellationInfo) ->
+                println("Constellation: $constellationName, Number of Satellites: ${constellationInfo.getNumberOfSatellites()}, Mean Altitude: ${constellationInfo.getMeanAltitude()}")
             }
         }
+
         4 -> {
             val longestRunningSatellites = SatelliteCalculator.findLongestRunningSatellites(satelliteDataList)
             longestRunningSatellites.forEachIndexed { index, satelliteInfo ->
                 println("Top ${index + 1}: NORAD Catalog Number: ${satelliteInfo.noradCatalogNumber}, Age in Years: ${satelliteInfo.ageInYears}")
             }
         }
+
         5 -> {
             val launchDateMap = SatelliteCalculator.analyzeLaunchYears(satelliteDataList)
-            launchDateMap.forEach { entry ->
-                println("Launch Year: ${entry.key}, Number of satellites: ${entry.value}")
+            launchDateMap.forEach { (launchYear, satelliteCount) ->
+                println("Launch Year: $launchYear, Number of satellites: $satelliteCount")
             }
         }
+
         else -> {
             println("Invalid choice.")
-            return
         }
     }
 

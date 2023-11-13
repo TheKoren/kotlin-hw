@@ -31,10 +31,12 @@ class SatelliteCalculatorTest {
 
         val expectedLEOCount = 3
         val expectedGEOCount = 1
+        val expectedMEOCount = 1
 
-        val (leoCount, geoCount) = SatelliteCalculator.countLEOandGEO(satelliteDataList)
+        val (leoCount, geoCount, meoCount) = SatelliteCalculator.countLEOandGEOandMEO(satelliteDataList)
         assertEquals(expectedLEOCount, leoCount)
         assertEquals(expectedGEOCount, geoCount)
+        assertEquals(expectedMEOCount, meoCount)
     }
 
     @Test

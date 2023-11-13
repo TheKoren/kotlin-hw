@@ -5,6 +5,7 @@ import analysis.data.SatelliteInfo
 import model.SatelliteData
 import java.time.LocalDate
 import kotlin.math.PI
+import kotlin.math.cbrt
 import kotlin.math.pow
 
 /**
@@ -29,18 +30,19 @@ object SatelliteCalculator {
      */
     fun calculateAltitude(meanMotion: Double): Double {
         val period = DAY_IN_SECONDS / meanMotion
-        return Math.cbrt((period.pow(2)* GRAVITY_CONSTANT) / (2 * PI).pow(2)) - EARTH_RADIUS_KM
+        return cbrt((period.pow(2)* GRAVITY_CONSTANT) / (2 * PI).pow(2)) - EARTH_RADIUS_KM
     }
 
     /**
-     * Count the number of LEO (Low Earth Orbit) and GEO (Geostationary Earth Orbit) satellites in a list.
+     * Count the number of LEO (Low Earth Orbit) and GEO (Geostationary Earth Orbit) and MEO (Medium Earth Orbit) satellites in a list.
      *
      * @param satelliteDataList A list of SatelliteData objects.
-     * @return A pair of counts, where the first element is the count of LEO satellites, and the second is the count of GEO satellites.
+     * @return A triple of counts, where the first element is the count of LEO satellites, and the second is the count of GEO satellites and the third is MEO satellites.
      */
-    fun countLEOandGEO(satelliteDataList: List<SatelliteData>): Pair<Int, Int> {
+    fun countLEOandGEOandMEO(satelliteDataList: List<SatelliteData>): Triple<Int, Int, Int> {
         var leoCount = 0
         var geoCount = 0
+        var meoCount = 0
 
         for (satelliteData in satelliteDataList) {
             val meanMotion = satelliteData.MEAN_MOTION
@@ -50,10 +52,12 @@ object SatelliteCalculator {
                 leoCount++
             } else if (altitude > GEO_ALTITUDE_THRESHOLD) {
                 geoCount++
+            } else {
+                meoCount++
             }
         }
 
-        return Pair(leoCount, geoCount)
+        return Triple(leoCount, geoCount, meoCount)
     }
 
     /**
@@ -83,15 +87,8 @@ object SatelliteCalculator {
      * @return A map where keys are constellation names and values are ConstellationInfo objects.
      */
     fun analyzeConstellations(satelliteDataList: List<SatelliteData>): Map<String, ConstellationInfo> {
-        val constellationMap = mutableMapOf<String, ConstellationInfo>()
-
-        for (satelliteData in satelliteDataList) {
-            val altitude = calculateAltitude(satelliteData.MEAN_MOTION)
-            val constellationName = satelliteData.OBJECT_NAME.getFirstPart()
-            val constellationInfo = constellationMap.getOrPut(constellationName) { ConstellationInfo() }
-            constellationInfo.addSatellite(altitude)
-        }
-        return constellationMap
+        return satelliteDataList.groupBy { it.OBJECT_NAME.getFirstPart() }
+            .mapValues { ConstellationInfo().apply { it.value.forEach { addSatellite(calculateAltitude(it.MEAN_MOTION)) } } }
     }
 
     /**
@@ -102,19 +99,11 @@ object SatelliteCalculator {
      */
     fun findLongestRunningSatellites(satelliteDataList: List<SatelliteData>) : List<SatelliteInfo> {
         val currentDate = LocalDate.now()
-        val longRunningSatellites = mutableListOf<SatelliteInfo>()
-
-        for (satelliteData in satelliteDataList) {
-            val launchDate = satelliteData.OBJECT_ID.getFirstPart()
-            val age = currentDate.year - launchDate.toInt()
-            if (age >= OLD_AGE_THRESHOLD) {
-                longRunningSatellites.add(SatelliteInfo(satelliteData.NORAD_CAT_ID, age))
-            }
-        }
-        if (longRunningSatellites.isEmpty()) {
-            println("No old satellites found for this dataset.")
-        }
-        return longRunningSatellites
+        return satelliteDataList.filter {
+            val launchDate = it.OBJECT_ID.getFirstPart().toInt()
+            currentDate.year - launchDate >= OLD_AGE_THRESHOLD
+        }.map { SatelliteInfo(it.NORAD_CAT_ID, currentDate.year - it.OBJECT_ID.getFirstPart().toInt()) }
+            .also { if (it.isEmpty()) println("No old satellites found for this dataset.") }
     }
 
     /**
@@ -124,17 +113,7 @@ object SatelliteCalculator {
      * @return A map where keys are launch years and values are the counts of satellites launched in each year.
      */
     fun analyzeLaunchYears(satelliteDataList: List<SatelliteData>) : Map<Int, Int> {
-        val launchDateMap = mutableMapOf<Int, Int>()
-
-        for (satelliteData in satelliteDataList) {
-            val launchDate = satelliteData.OBJECT_ID.getFirstPart().toInt()
-            val currentCount = launchDateMap[launchDate]
-            if (currentCount != null) {
-                launchDateMap[launchDate] = currentCount + 1
-            } else {
-                launchDateMap[launchDate] = 1
-            }
-        }
-        return launchDateMap
+        return satelliteDataList.groupingBy { it.OBJECT_ID.getFirstPart().toInt() }
+            .eachCount()
     }
 }
