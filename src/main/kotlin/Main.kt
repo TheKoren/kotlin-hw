@@ -40,13 +40,14 @@ fun main() {
     println("3. Analyze Constellations")
     println("4. Find Longest-Running Satellites")
     println("5. Launch date of Satellites")
+    println("6. Calculate Apogee and Perigee Altitudes")
 
     print("Enter the number of the calculation you want to perform: ")
     when (scanner.nextInt()) {
         1 -> {
             val topSatellitesByMeanMotion = SatelliteCalculator.getTopSatellitesByMeanMotion(satelliteDataList)
             topSatellitesByMeanMotion.take(5).forEachIndexed { index, satelliteData ->
-                println("Top ${index + 1}: NORAD Catalog Number: ${satelliteData.NORAD_CAT_ID}, Mean Motion: ${satelliteData.MEAN_MOTION}")
+                println("Top ${index + 1}: NORAD Catalog Number: ${satelliteData.NORAD_CAT_ID}, Mean Motion: ${satelliteData.MEAN_MOTION} rev/day")
             }
         }
 
@@ -55,13 +56,13 @@ fun main() {
             val totalSatellites = satelliteDataList.size
             println("Number of Satellites in LEO: $leoCount. LEO percentage: ${leoCount * 100.0 / totalSatellites}%")
             println("Number of Satellites in GEO: $geoCount. GEO percentage: ${geoCount * 100.0 / totalSatellites}%")
-            println("Number of Satellites in MEO: $geoCount. MEO percentage: ${meoCount * 100.0 / totalSatellites}%")
+            println("Number of Satellites in MEO: $meoCount. MEO percentage: ${meoCount * 100.0 / totalSatellites}%")
         }
 
         3 -> {
             val constellations = SatelliteCalculator.analyzeConstellations(satelliteDataList)
             constellations.forEach { (constellationName, constellationInfo) ->
-                println("Constellation: $constellationName, Number of Satellites: ${constellationInfo.getNumberOfSatellites()}, Mean Altitude: ${constellationInfo.getMeanAltitude()}")
+                println("Constellation: $constellationName, Number of Satellites: ${constellationInfo.getNumberOfSatellites()}, Mean Altitude: ${constellationInfo.getMeanAltitude()} km")
             }
         }
 
@@ -76,6 +77,13 @@ fun main() {
             val launchDateMap = SatelliteCalculator.analyzeLaunchYears(satelliteDataList)
             launchDateMap.forEach { (launchYear, satelliteCount) ->
                 println("Launch Year: $launchYear, Number of satellites: $satelliteCount")
+            }
+        }
+
+        6 -> {
+            val altitudeMap = SatelliteCalculator.analyzeOrbit(satelliteDataList)
+            altitudeMap.forEach{(noradNum, altitudePair) ->
+                println("Catalog number: $noradNum, Apogee: ${altitudePair.first} km, Perigee: ${altitudePair.second} km")
             }
         }
 

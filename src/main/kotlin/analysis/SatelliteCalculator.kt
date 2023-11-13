@@ -12,14 +12,6 @@ import kotlin.math.pow
  * A utility object for calculating and analyzing satellite-related information.
  */
 object SatelliteCalculator {
-    private const val EARTH_RADIUS_KM = 6371.0
-    private const val GRAVITY_CONSTANT = 398600.4418
-    private const val DAY_IN_SECONDS = 86400
-
-    private const val LEO_ALTITUDE_THRESHOLD = 1000.0
-    private const val GEO_ALTITUDE_THRESHOLD = 35786.0
-
-    private const val OLD_AGE_THRESHOLD = 30
 
     /**
      * Calculate the altitude of a satellite based on its mean motion.
@@ -29,8 +21,8 @@ object SatelliteCalculator {
      * @return The altitude of the satellite in kilometers.
      */
     fun calculateAltitude(meanMotion: Double): Double {
-        val period = DAY_IN_SECONDS / meanMotion
-        return cbrt((period.pow(2)* GRAVITY_CONSTANT) / (2 * PI).pow(2)) - EARTH_RADIUS_KM
+        val period = Constants.DAY_IN_SECONDS / meanMotion
+        return cbrt((period.pow(2) * Constants.GRAVITY_CONSTANT) / (2 * PI).pow(2)) - Constants.EARTH_RADIUS_KM
     }
 
     /**
@@ -40,24 +32,24 @@ object SatelliteCalculator {
      * @return A triple of counts, where the first element is the count of LEO satellites, and the second is the count of GEO satellites and the third is MEO satellites.
      */
     fun countLEOandGEOandMEO(satelliteDataList: List<SatelliteData>): Triple<Int, Int, Int> {
-        var leoCount = 0
-        var geoCount = 0
-        var meoCount = 0
+        return satelliteDataList
+            .map { satelliteData ->
+                val meanMotion = satelliteData.MEAN_MOTION
+                val altitude = calculateAltitude(meanMotion)
 
-        for (satelliteData in satelliteDataList) {
-            val meanMotion = satelliteData.MEAN_MOTION
-            val altitude = calculateAltitude(meanMotion)
-
-            if (altitude < LEO_ALTITUDE_THRESHOLD) {
-                leoCount++
-            } else if (altitude > GEO_ALTITUDE_THRESHOLD) {
-                geoCount++
-            } else {
-                meoCount++
+                when {
+                    altitude < Constants.LEO_ALTITUDE_THRESHOLD -> Triple(1, 0, 0)
+                    altitude > Constants.GEO_ALTITUDE_THRESHOLD -> Triple(0, 1, 0)
+                    else -> Triple(0, 0, 1)
+                }
             }
-        }
-
-        return Triple(leoCount, geoCount, meoCount)
+            .reduce { acc, triple ->
+                Triple(
+                    acc.first + triple.first,
+                    acc.second + triple.second,
+                    acc.third + triple.third
+                )
+            }
     }
 
     /**
@@ -67,7 +59,7 @@ object SatelliteCalculator {
      * @return A list of NORAD Catalog Numbers.
      */
     fun getNoradCatalogNumber(satelliteDataList: List<SatelliteData>): List<Int> {
-        return satelliteDataList.map {it.NORAD_CAT_ID}
+        return satelliteDataList.map { it.NORAD_CAT_ID }
     }
 
     /**
@@ -97,11 +89,11 @@ object SatelliteCalculator {
      * @param satelliteDataList A list of SatelliteData objects.
      * @return A list of SatelliteInfo objects representing long-running satellites.
      */
-    fun findLongestRunningSatellites(satelliteDataList: List<SatelliteData>) : List<SatelliteInfo> {
+    fun findLongestRunningSatellites(satelliteDataList: List<SatelliteData>): List<SatelliteInfo> {
         val currentDate = LocalDate.now()
         return satelliteDataList.filter {
             val launchDate = it.OBJECT_ID.getFirstPart().toInt()
-            currentDate.year - launchDate >= OLD_AGE_THRESHOLD
+            currentDate.year - launchDate >= Constants.OLD_AGE_THRESHOLD
         }.map { SatelliteInfo(it.NORAD_CAT_ID, currentDate.year - it.OBJECT_ID.getFirstPart().toInt()) }
             .also { if (it.isEmpty()) println("No old satellites found for this dataset.") }
     }
@@ -112,8 +104,20 @@ object SatelliteCalculator {
      * @param satelliteDataList A list of SatelliteData objects.
      * @return A map where keys are launch years and values are the counts of satellites launched in each year.
      */
-    fun analyzeLaunchYears(satelliteDataList: List<SatelliteData>) : Map<Int, Int> {
+    fun analyzeLaunchYears(satelliteDataList: List<SatelliteData>): Map<Int, Int> {
         return satelliteDataList.groupingBy { it.OBJECT_ID.getFirstPart().toInt() }
             .eachCount()
+    }
+
+    /**
+     * Analyze apogee and perigee altitudes of satellites
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A map where keys are norad catalog numbers and values are the apogee and perigee altitudes.
+     */
+    fun analyzeOrbit(satelliteDataList: List<SatelliteData>): Map<Int, Pair<Double, Double>> {
+        return satelliteDataList.associate { data ->
+            data.NORAD_CAT_ID to Pair(data.calculateApogeeAltitude(), data.calculatePerigeeAltitude())
+        }
     }
 }
