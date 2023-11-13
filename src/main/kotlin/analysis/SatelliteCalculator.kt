@@ -4,10 +4,12 @@ import analysis.data.ConstellationInfo
 import analysis.data.SatelliteInfo
 import model.SatelliteData
 import java.time.LocalDate
-import java.time.Period
 import kotlin.math.PI
 import kotlin.math.pow
 
+/**
+ * A utility object for calculating and analyzing satellite-related information.
+ */
 object SatelliteCalculator {
     private const val EARTH_RADIUS_KM = 6371.0
     private const val GRAVITY_CONSTANT = 398600.4418
@@ -19,13 +21,23 @@ object SatelliteCalculator {
     private const val OLD_AGE_THRESHOLD = 30
 
     /**
+     * Calculate the altitude of a satellite based on its mean motion.
+     *
+     * @param meanMotion The mean motion of the satellite in orbits per day.
      * @see <a href="https://www.spaceacademy.net.au/watch/track/leopars.htm">SpaceAcademy</a>
-      */
+     * @return The altitude of the satellite in kilometers.
+     */
     fun calculateAltitude(meanMotion: Double): Double {
         val period = DAY_IN_SECONDS / meanMotion
         return Math.cbrt((period.pow(2)* GRAVITY_CONSTANT) / (2 * PI).pow(2)) - EARTH_RADIUS_KM
     }
 
+    /**
+     * Count the number of LEO (Low Earth Orbit) and GEO (Geostationary Earth Orbit) satellites in a list.
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A pair of counts, where the first element is the count of LEO satellites, and the second is the count of GEO satellites.
+     */
     fun countLEOandGEO(satelliteDataList: List<SatelliteData>): Pair<Int, Int> {
         var leoCount = 0
         var geoCount = 0
@@ -44,14 +56,32 @@ object SatelliteCalculator {
         return Pair(leoCount, geoCount)
     }
 
+    /**
+     * Get a list of NORAD Catalog Numbers from a list of SatelliteData objects.
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A list of NORAD Catalog Numbers.
+     */
     fun getNoradCatalogNumber(satelliteDataList: List<SatelliteData>): List<Int> {
         return satelliteDataList.map {it.NORAD_CAT_ID}
     }
 
+    /**
+     * Get a list of SatelliteData objects sorted by mean motion in descending order.
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A sorted list of SatelliteData objects.
+     */
     fun getTopSatellitesByMeanMotion(satelliteDataList: List<SatelliteData>): List<SatelliteData> {
         return satelliteDataList.sortedByDescending { it.MEAN_MOTION }
     }
 
+    /**
+     * Analyze constellations and calculate satellite counts for each constellation.
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A map where keys are constellation names and values are ConstellationInfo objects.
+     */
     fun analyzeConstellations(satelliteDataList: List<SatelliteData>): Map<String, ConstellationInfo> {
         val constellationMap = mutableMapOf<String, ConstellationInfo>()
 
@@ -64,6 +94,12 @@ object SatelliteCalculator {
         return constellationMap
     }
 
+    /**
+     * Find and list the longest-running satellites based on their launch year.
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A list of SatelliteInfo objects representing long-running satellites.
+     */
     fun findLongestRunningSatellites(satelliteDataList: List<SatelliteData>) : List<SatelliteInfo> {
         val currentDate = LocalDate.now()
         val longRunningSatellites = mutableListOf<SatelliteInfo>()
@@ -75,9 +111,18 @@ object SatelliteCalculator {
                 longRunningSatellites.add(SatelliteInfo(satelliteData.NORAD_CAT_ID, age))
             }
         }
+        if (longRunningSatellites.isEmpty()) {
+            println("No old satellites found for this dataset.")
+        }
         return longRunningSatellites
     }
 
+    /**
+     * Analyze launch years and count the number of satellites launched in each year.
+     *
+     * @param satelliteDataList A list of SatelliteData objects.
+     * @return A map where keys are launch years and values are the counts of satellites launched in each year.
+     */
     fun analyzeLaunchYears(satelliteDataList: List<SatelliteData>) : Map<Int, Int> {
         val launchDateMap = mutableMapOf<Int, Int>()
 
