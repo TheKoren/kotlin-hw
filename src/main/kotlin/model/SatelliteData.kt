@@ -24,22 +24,22 @@ package model
  * @property MEAN_MOTION_DOT The first derivative of mean motion.
  * @property MEAN_MOTION_DDOT The second derivative of mean motion.
  */
-data class SatelliteData (
-    val OBJECT_NAME: String,
-    val OBJECT_ID: String,
-    val EPOCH: String,
-    val MEAN_MOTION: Double,
-    val ECCENTRICITY: Double,
-    val INCLINATION: Double,
-    val RA_OF_ASC_NODE: Double,
-    val ARG_OF_PERICENTER: Double,
-    val MEAN_ANOMALY: Double,
-    val EPHEMERIS_TYPE: Int,
-    val CLASSIFICATION_TYPE: String,
-    val NORAD_CAT_ID: Int,
-    val ELEMENT_SET_NO: Int,
-    val REV_AT_EPOCH: Int,
-    val BSTAR: Double,
-    val MEAN_MOTION_DOT: Double,
-    val MEAN_MOTION_DDOT: Double
+data class SatelliteData(
+    val OBJECT_NAME: String = "",
+    val OBJECT_ID: String = "",
+    val EPOCH: String = "",
+    val MEAN_MOTION: Double = 0.0,
+    val ECCENTRICITY: Double = 0.0,
+    val INCLINATION: Double = 0.0,
+    val RA_OF_ASC_NODE: Double = 0.0,
+    val ARG_OF_PERICENTER: Double = 0.0,
+    val MEAN_ANOMALY: Double = 0.0,
+    val EPHEMERIS_TYPE: Int = 0,
+    val CLASSIFICATION_TYPE: String = "",
+    val NORAD_CAT_ID: Int = 0,
+    val ELEMENT_SET_NO: Int = 0,
+    val REV_AT_EPOCH: Int = 0,
+    val BSTAR: Double = 0.0,
+    val MEAN_MOTION_DOT: Double = 0.0,
+    val MEAN_MOTION_DDOT: Double = 0.0
 )
