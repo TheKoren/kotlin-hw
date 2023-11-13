@@ -17,6 +17,7 @@ class DataParser {
          * @param filePath The path to the JSON file to parse.
          * @return A list of SatelliteData objects parsed from the JSON file.
          */
+        @Suppress("unused")
         fun parseTLEFile(filePath: String): List<SatelliteData> {
             val jsonString = File(filePath).readText()
             return parseSatelliteDataFromJson(jsonString)
