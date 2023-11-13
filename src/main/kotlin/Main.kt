@@ -15,13 +15,13 @@ fun main() {
     print("Enter the number of the dataset on which you want to perform analysis: ")
     val catalog : String = when (scanner.nextInt()) {
         1 -> {
-            "stations"
+            "active"
         }
         2 -> {
             "last-30-days"
         }
         3 -> {
-            "active"
+            "stations"
         }
         else -> {
             println("Invalid choice.")
@@ -33,6 +33,7 @@ fun main() {
     val satelliteDataList : List<SatelliteData>
     if (responseData != null) {
         satelliteDataList = responseData.let { DataParser.parseJsonFile(it) }
+        println("# of satellite data entries: ${satelliteDataList.size}")
     } else {
         println("Failed to fetch satellite data")
         return
@@ -55,8 +56,8 @@ fun main() {
         }
         2 -> {
             val (leoCount, geoCount) = SatelliteCalculator.countLEOandGEO(satelliteDataList)
-            println("Number of Satellites in LEO: $leoCount")
-            println("Number of Satellites in GEO: $geoCount")
+            println("Number of Satellites in LEO: $leoCount. LEO percentage: ${(leoCount * 100 / satelliteDataList.size).toDouble()}%")
+            println("Number of Satellites in GEO: $geoCount. GEO percentage: ${(geoCount * 100 / satelliteDataList.size).toDouble()}%")
         }
         3 -> {
             val constellations = SatelliteCalculator.analyzeConstellations(satelliteDataList)

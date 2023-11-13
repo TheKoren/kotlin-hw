@@ -8,12 +8,11 @@ import model.SatelliteData
 /**
  * A utility class for parsing satellite data from JSON files.
 * This class can be used to parse JSON data into a list of SatelliteData objects.
-* It is not currently in use but is kept for potential future use.
 */
 class DataParser {
     companion object {
         /**
-         * Parse satellite data from a JSON file.
+         * Parse satellite data from a JSON file. It is not currently in use but is kept for potential future use.
          *
          * @param filePath The path to the JSON file to parse.
          * @return A list of SatelliteData objects parsed from the JSON file.
